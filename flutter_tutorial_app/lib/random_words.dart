@@ -62,7 +62,10 @@ class _RandomWordsState extends State<RandomWords> {
           ? ListTile.divideTiles(context: context, tiles: tiles).toList()
           : <Widget>[];
       return Scaffold(
-        appBar: AppBar(title: Text('Saved Suggestions')),
+        appBar: AppBar(
+          title: const Text('Saved Suggestions'),
+          backgroundColor: Colors.blueGrey.shade800,
+        ),
         body: ListView(
           children: divided,
         ),
@@ -75,6 +78,7 @@ class _RandomWordsState extends State<RandomWords> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Startup Name Generator'),
+        backgroundColor: Colors.blueGrey,
         actions: [
           IconButton(
             onPressed: _pushSaved,
