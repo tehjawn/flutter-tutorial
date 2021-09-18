@@ -1,6 +1,6 @@
 # flutter_tutorial_app
 
-A new Flutter project.
+> Tutorial App based on Google CodeLabs' "First Flutter App": https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
 
 ## Getting Started
 
