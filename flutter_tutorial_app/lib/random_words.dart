@@ -52,11 +52,35 @@ class _RandomWordsState extends State<RandomWords> {
     );
   }
 
+  void _pushSaved() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      final tiles = _saved.map((WordPair pair) {
+        return ListTile(title: Text(pair.asPascalCase, style: _biggerFont));
+      });
+      final divided = tiles.isNotEmpty
+          ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+          : <Widget>[];
+      return Scaffold(
+        appBar: AppBar(title: Text('Saved Suggestions')),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Startup Name Generator'),
+        actions: [
+          IconButton(
+            onPressed: _pushSaved,
+            icon: Icon(Icons.list),
+          )
+        ],
       ),
       body: _buildSuggestions(),
     );
