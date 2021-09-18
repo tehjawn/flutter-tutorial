@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter_tutorial_app/saved_names_route.dart';
 
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
@@ -52,9 +53,8 @@ class _RandomWordsState extends State<RandomWords> {
     );
   }
 
-  void _pushSaved() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
+  Route _buildSavedNamesRoute() {
+    return SavedNamesRoute(builder: (BuildContext context) {
       final tiles = _saved.map((WordPair pair) {
         return ListTile(title: Text(pair.asPascalCase, style: _biggerFont));
       });
@@ -70,7 +70,11 @@ class _RandomWordsState extends State<RandomWords> {
           children: divided,
         ),
       );
-    }));
+    });
+  }
+
+  void _pushSaved() {
+    Navigator.of(context).push(_buildSavedNamesRoute());
   }
 
   @override
