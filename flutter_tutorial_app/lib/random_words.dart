@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter_tutorial_app/saved_names_route.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
@@ -10,9 +12,27 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   final _suggestions = <WordPair>[];
-  final _saved = <WordPair>{};
+  final _saved = <String>{};
   final _biggerFont = const TextStyle(fontSize: 18);
+
+  @override
+  void initState() {
+    super.initState();
+    // Future<String> savedPairs =
+    _prefs.then((SharedPreferences prefs) {
+      String locallySavedWords = (prefs.getString('favorite_words') ?? '');
+      if (locallySavedWords.length > 2) {
+        locallySavedWords
+            .substring(1, locallySavedWords.length - 1)
+            .split(',')
+            .forEach((word) => _saved.add(word.trim()));
+      }
+      developer.log(locallySavedWords);
+      developer.log(_saved.toString());
+    });
+  }
 
   // Private helper function that builds our list of word pairs
   Widget _buildSuggestions() {
@@ -28,35 +48,40 @@ class _RandomWordsState extends State<RandomWords> {
             // Generate 10 more word pairs and add them to the suggestions list
             _suggestions.addAll(generateWordPairs().take(10));
           }
-          return _buildRow(_suggestions[index]);
+          return _buildRow(_suggestions[index].asPascalCase);
         });
   }
 
+  void _saveFavoriteWordPair(alreadySaved, pair) async {
+    setState(() {
+      if (alreadySaved) {
+        _saved.remove(pair);
+      } else {
+        _saved.add(pair);
+      }
+    });
+    SharedPreferences prefs = await _prefs;
+    prefs.setString('favorite_words', _saved.toString());
+  }
+
   // Private helper function that builds each row in the word pair list
-  Widget _buildRow(WordPair pair) {
+  Widget _buildRow(String pair) {
     final alreadySaved = _saved.contains(pair); // Check if pair is in saved map
     return ListTile(
-      title: Text(pair.asPascalCase, style: _biggerFont),
+      title: Text(pair, style: _biggerFont),
       trailing: Icon(
         alreadySaved ? Icons.favorite : Icons.favorite_border,
         color: alreadySaved ? Colors.red : null,
       ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
+      onTap: () => _saveFavoriteWordPair(alreadySaved, pair),
     );
   }
 
   Route _buildSavedNamesRoute() {
+    developer.log(_saved.toString());
     return SavedNamesRoute(builder: (BuildContext context) {
-      final tiles = _saved.map((WordPair pair) {
-        return ListTile(title: Text(pair.asPascalCase, style: _biggerFont));
+      final tiles = _saved.map((String pair) {
+        return ListTile(title: Text(pair, style: _biggerFont));
       });
       final divided = tiles.isNotEmpty
           ? ListTile.divideTiles(context: context, tiles: tiles).toList()
@@ -86,7 +111,7 @@ class _RandomWordsState extends State<RandomWords> {
         actions: [
           IconButton(
             onPressed: _pushSaved,
-            icon: Icon(Icons.list),
+            icon: const Icon(Icons.list),
           )
         ],
       ),
