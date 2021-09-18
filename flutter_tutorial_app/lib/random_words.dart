@@ -10,6 +10,7 @@ class RandomWords extends StatefulWidget {
 
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
+  final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18);
 
   // Private helper function that builds our list of word pairs
@@ -32,7 +33,14 @@ class _RandomWordsState extends State<RandomWords> {
 
   // Private helper function that builds each row in the word pair list
   Widget _buildRow(WordPair pair) {
-    return ListTile(title: Text(pair.asPascalCase, style: _biggerFont));
+    final alreadySaved = _saved.contains(pair); // Check if pair is in saved map
+    return ListTile(
+      title: Text(pair.asPascalCase, style: _biggerFont),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+    );
   }
 
   @override
